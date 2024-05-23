@@ -1,2 +1,2 @@
 all:
-	gcc -Wall -Wextra -g figure.c main.c -lncurses -o tetris
+	gcc -g figure.c main.c termius.c -lncurses -o tetris

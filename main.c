@@ -1,15 +1,16 @@
 #include "figure.h"
 #include <unistd.h>
 #include <ncurses.h>
+#include <pthread.h>
 
 typedef enum {
-    PAUSE,
-    LEFT,
-    RIGHT,
-    DOWN,
-    FAST_DOWN,
-    TERMINMATE,
-    ROTATE
+    PAUSE, 
+    LEFT, 
+    RIGHT, 
+    DOWN, 
+    FAST_DOWN, 
+    TERMINMATE, 
+    ROTATE 
 } game_states_t;
 
 #define UNUSED(x) ((void)(x))
@@ -17,32 +18,49 @@ typedef enum {
 void s21_transpose(figure_t *f);
 void render(int field[][WIDTH], figure_t* f);
 void move_figure(figure_t* f, int direction);
+int is_collision(int field[][WIDTH], figure_t* f);
 
+int is_collision(int field[][WIDTH], figure_t* f) {
+    for (int i = 0; i < f->height; i++) {
+        for (int j = 0; j < f->width; j++) {
+            if ((field[f->y + i][f->x + j] + f->matrix[i][j] == 2) ||
+                (f->y + f->height == HEIGHT))
+                return 1;
+        }
+    }
+    return 0;
+}
+
+void* fall_figure(void* f) {
+  while (((figure_t*)f)->y + ((figure_t*)f)->height < HEIGHT) {
+    ((figure_t*)f)->y++;
+    sleep(1);
+  }
+}
+
+//FIXME
 int main(void) {
     initscr();
     noecho();
     cbreak();
     keypad(stdscr, TRUE);
     curs_set(0);
-    // figure_t f = {0};
-    // create_figure_matrix(&f);
-    // print_figure(&f);
-    // delete_figure(&f);
-    int fast_down = 0;
+    timeout(500);
     int filed[HEIGHT][WIDTH] = {0};
+    pthread_t* thread = NULL;
     figure_t* f = NULL;
-
     while (1) {
 
         if (f == NULL) {
+            thread = calloc(1, sizeof(pthread_t));
             f = calloc(1, sizeof(figure_t));
             create_figure_matrix(f);
+            printw("\n%d\n", f->height);
+            pthread_create(thread, NULL, fall_figure, f);
         }
-
         render(filed, f);
         refresh();
-        int ch = getch();
-        switch (ch) {
+        switch (getch()) {
             case KEY_LEFT:
                 move_figure(f, -1);
                 break;
@@ -50,25 +68,24 @@ int main(void) {
                 move_figure(f, 1);
                 break;
             case KEY_DOWN:
-                f->y++;
                 break;
-            case 'u': //ускорениe
-                fast_down = 1;
-                break;
-                case 't' :
+            case 't':
                 s21_transpose(f);
-                break;
-            default:
                 break;
         }
 
-        if (fast_down) {
-            usleep(2000000);
-        } else {
-            usleep(100000);
+        if (is_collision(filed, f)) {
+          pthread_cancel(*thread);
+          for (int i = 0; i < f->height; i++) {
+            for (int j = 0; j < f->width; j++) {
+              filed[i + f->y][j + f->x] = f->matrix[i][j];
+            }
+          }
+          delete_figure(f);
+          free(thread);
+          f = NULL;
+          thread = NULL;
         }
-        //sleep(1);
-        
     }
     endwin();
     return 0;
@@ -100,7 +117,7 @@ void render(int field[][WIDTH], figure_t* f) {
             if (temp_field[i][j]) {
                 mvaddch(i, j * 2, '#'); // рисовать фигуру
             } else {
-                mvaddch(i, j * 2, ' '); // пустое пространство
+                mvaddch(i, j * 2, '-'); // пустое пространство
             }
         }
     }
@@ -116,8 +133,7 @@ void s21_transpose(figure_t *f) {
       for (int j = 0; j < f->width; j++) {
         result[i][j] = f->matrix[i][j];
       }
-    
-  }
+    }
   delete_figure(f);
     int width_1 = f->width;
     f->width= f->height;
