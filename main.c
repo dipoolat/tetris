@@ -102,3 +102,15 @@ void render(int field[][WIDTH], figure_t* f) {
         }
     }
 }
+
+void s21_transpose(figure_t f, int ** result) {
+  
+
+    for (int i = 0; i < f.height; i++) {
+      for (int j = 0; j < f.width; j++) {
+        result[j][i] = f.matrix[i][j];
+      }
+    
+  }
+
+}
