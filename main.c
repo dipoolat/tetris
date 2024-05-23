@@ -14,7 +14,7 @@ typedef enum {
 
 #define UNUSED(x) ((void)(x))
 
-
+void s21_transpose(figure_t *f);
 void render(int field[][WIDTH], figure_t* f);
 void move_figure(figure_t* f, int direction);
 
@@ -54,6 +54,9 @@ int main(void) {
                 break;
             case 'u': //ускорениe
                 fast_down = 1;
+                break;
+                case 't' :
+                s21_transpose(f);
                 break;
             default:
                 break;
@@ -103,14 +106,21 @@ void render(int field[][WIDTH], figure_t* f) {
     }
 }
 
-void s21_transpose(figure_t f, int ** result) {
-  
-
-    for (int i = 0; i < f.height; i++) {
-      for (int j = 0; j < f.width; j++) {
-        result[j][i] = f.matrix[i][j];
+void s21_transpose(figure_t *f) {
+    int ** result = calloc(f->width, sizeof(int*));
+    for(int i=0; i<f->width; i++)
+    {
+        result[i]=calloc(f->height, sizeof(int));
+    }
+    for (int i = 0; i < f->height; i++) {
+      for (int j = 0; j < f->width; j++) {
+        result[i][j] = f->matrix[i][j];
       }
     
   }
-
+  delete_figure(f);
+    int width_1 = f->width;
+    f->width= f->height;
+    f->height = width_1;
+    f->matrix= result;
 }
