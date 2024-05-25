@@ -2,8 +2,8 @@
 #include "file_reader.h"
 #include <ncurses.h>
 #include <pthread.h>
-#include <unistd.h>
 #include <string.h>
+#include <unistd.h>
 
 typedef enum {
   PAUSE,
@@ -152,6 +152,8 @@ void spawn_figure(game_info_t *gi, pthread_t **thread) {
   gi->current_figure = gi->next_figure;
   gi->next_figure = calloc(1, sizeof(figure_t));
   create_figure_matrix(gi->next_figure);
+  if (*thread != NULL)
+    free(*thread);
   *thread = calloc(1, sizeof(pthread_t));
   pthread_create(*thread, NULL, fall_figure, gi);
 }
@@ -195,12 +197,14 @@ void terminate_figure(game_info_t *gi, pthread_t **thread) {
   }
 }
 
-void terminate_game(game_info_t* gi) {
+void terminate_game(game_info_t *gi) {
   int y, x;
-  getmaxyx(stdscr,y,x);
+  getmaxyx(stdscr, y, x);
   mvprintw(y / 2, x / 2 - strlen("Game Over") / 2, "Game Over");
-  mvprintw(y / 2 + 2, x / 2 - strlen("You got 00000 points") / 2, "You got %05d points", gi->score);
-  mvprintw(y / 2 + 4, x / 2 - strlen("Press any key to proceed") / 2, "Press any key to proceed");
+  mvprintw(y / 2 + 2, x / 2 - strlen("You got 00000 points") / 2,
+           "You got %05d points", gi->score);
+  mvprintw(y / 2 + 4, x / 2 - strlen("Press any key to proceed") / 2,
+           "Press any key to proceed");
   timeout(-1);
   getch();
 }
@@ -233,27 +237,26 @@ void gain_score(game_info_t *gi) {
 }
 
 void quick_fall(game_info_t *gi) {
-  if (gi->state == FAST_DOWN) {
-    gi->delay = 100000 / gi->level;
-  } else {
-    gi->delay = 1000000 / gi->level;
-  }
+  if (gi->state != FAST_DOWN)
+    return;
+  while (!is_collision_y(gi))
+    gi->current_figure->y++;
 }
 
-int game_over(game_info_t* gi) {
+int game_over(game_info_t *gi) {
   return gi->current_figure->y == 0 && is_collision_y(gi);
 }
 
-void recall(game_info_t* gi, pthread_t* thread) {
+void recall(game_info_t *gi, pthread_t *thread) {
   endwin();
 
   if (gi->current_figure)
-  delete_figure(gi->current_figure);
+    delete_figure(gi->current_figure);
   if (gi->next_figure)
-  delete_figure(gi->next_figure);
+    delete_figure(gi->next_figure);
   if (thread) {
-pthread_cancel(*thread);
-  free(thread);
+    pthread_cancel(*thread);
+    free(thread);
   }
 }
 
@@ -264,7 +267,7 @@ int main(void) {
   pthread_t *thread = NULL;
   game_info_t gi = {0};
   gi.high_score = get_high_score();
-  gi.delay = 10000;
+  gi.delay = 1000000;
   gi.level = 1;
 
   int running = 1;
@@ -335,8 +338,8 @@ void render(game_info_t *gi) {
   }
   for (int i = 0; i < WIDTH; i++) {
     attron(COLOR_PAIR(7));
-      printw("%3c", ' ');
-      attroff(COLOR_PAIR(7));
+    printw("%3c", ' ');
+    attroff(COLOR_PAIR(7));
   }
   for (int i = 0; i < gi->next_figure->height; i++) {
     for (int j = 0; j < gi->next_figure->width; j++) {
