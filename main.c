@@ -43,6 +43,9 @@ void move_figure(figure_t *f, int direction, int field[][WIDTH]);
 int is_collision_y(int field[][WIDTH], figure_t *f);
 int is_collision_x(int field[][WIDTH], figure_t *f, int dir);
 int clear_lines(int field[][WIDTH]);
+int calculate_score(int lines_cleared);
+int is_game_over(int field[][WIDTH]);
+
 
 int is_collision_y(int field[][WIDTH], figure_t *f) {
   for (int i = 0; i < f->height; i++) {
@@ -112,6 +115,10 @@ int main(void) {
         }
       }
       break;
+    case 'v':
+      endwin();
+      return 0; // Выход из игры
+      break;
     }
 
     if (is_collision_y(filed, f)) {
@@ -127,10 +134,29 @@ int main(void) {
       f = NULL;
       thread = NULL;
     }
-    score += clear_lines(filed);
+     int cleared_lines = clear_lines(filed);
+    score += calculate_score(cleared_lines); 
+
     if (score > h_score)
         set_high_score(score);
     erase(); // очистить экран
+
+    if (is_game_over(filed)) {
+      // Остановка падения фигур
+      if (thread) {
+        pthread_cancel(*thread);
+        free(thread);
+        thread = NULL;
+      }
+      erase();
+      mvprintw(HEIGHT / 2 - 1, WIDTH / 2 - 5, "Game Over!");
+      mvprintw(HEIGHT / 2 + 1, WIDTH / 2 - 5, "Final score: %d", score);
+      refresh();
+      sleep(3);
+      // Выход из игры
+      endwin();
+      return 0;
+  }
   }
   endwin();
   return 0;
@@ -197,4 +223,23 @@ int clear_lines(int field[][WIDTH]) {
         }
     }
     return total_cleared;
+}
+
+int calculate_score(int lines_cleared) {
+  switch (lines_cleared) {
+    case 1: return 100;
+    case 2: return 300;
+    case 3: return 700;
+    case 4: return 1500;
+    default: return 0;
+  }
+}
+
+int is_game_over(int field[][WIDTH]) {
+  for (int i = 0; i < WIDTH; i++) {
+    if (field[0][i]) {
+      return 1; // Верхний ряд заполнен, игра окончена
+    }
+  }
+  return 0;
 }
