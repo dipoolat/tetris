@@ -3,6 +3,7 @@
 #include <ncurses.h>
 #include <pthread.h>
 #include <unistd.h>
+#include <string.h>
 
 typedef enum {
   PAUSE,
@@ -108,6 +109,11 @@ game_state_t get_current_state() {
   case 'p':
     action = PAUSE;
     break;
+  case 'q':
+  case 'v':
+    erase();
+    endwin();
+    exit(0);
   }
   return action;
 }
@@ -156,7 +162,7 @@ void init_ncurses() {
   cbreak();
   keypad(stdscr, TRUE);
   curs_set(0);
-  timeout(50);
+  timeout(100);
   start_color();
   init_pair(0, COLOR_BLACK, COLOR_BLACK);
   init_pair(1, COLOR_BLACK, COLOR_BLUE);
@@ -166,6 +172,7 @@ void init_ncurses() {
   init_pair(5, COLOR_BLACK, COLOR_RED);
   init_pair(6, COLOR_BLACK, COLOR_YELLOW);
   init_pair(7, COLOR_BLACK, COLOR_WHITE);
+  init_pair(8, COLOR_RED, COLOR_BLACK);
 }
 
 void terminate_figure(game_info_t *gi, pthread_t **thread) {
@@ -188,23 +195,63 @@ void terminate_figure(game_info_t *gi, pthread_t **thread) {
   }
 }
 
+void terminate_game(game_info_t* gi) {
+  int y, x;
+  getmaxyx(stdscr,y,x);
+  mvprintw(y / 2, x / 2 - strlen("Game Over") / 2, "Game Over");
+  mvprintw(y / 2 + 2, x / 2 - strlen("You got 00000 points") / 2, "You got %05d points", gi->score);
+  mvprintw(y / 2 + 4, x / 2 - strlen("Press any key to proceed") / 2, "Press any key to proceed");
+  timeout(-1);
+  getch();
+}
+
 void take_pause(game_info_t *gi) {
   if (gi->state == PAUSE)
     gi->pause = !gi->pause;
 }
 
+int calculate_score(int lines_cleared) {
+  switch (lines_cleared) {
+  case 1:
+    return 100;
+  case 2:
+    return 300;
+  case 3:
+    return 700;
+  case 4:
+    return 1500;
+  default:
+    return 0;
+  }
+}
+
 void gain_score(game_info_t *gi) {
-  gi->score += clear_lines(gi->game_field);
+  gi->score += calculate_score(clear_lines(gi->game_field));
   if (gi->score > gi->high_score)
     set_high_score(gi->score);
+  gi->level = gi->score / 600 + 1;
 }
 
 void quick_fall(game_info_t *gi) {
   if (gi->state == FAST_DOWN) {
-    gi->delay = 100000;
+    gi->delay = 100000 / gi->level;
   } else {
-    gi->delay = 1000000;
+    gi->delay = 1000000 / gi->level;
   }
+}
+
+int game_over(game_info_t* gi) {
+  return gi->current_figure->y == 0 && is_collision_y(gi);
+}
+
+void recall(game_info_t* gi, pthread_t* thread) {
+  endwin();
+
+  delete_figure(gi->current_figure);
+  delete_figure(gi->next_figure);
+  pthread_cancel(*thread);
+  free(thread);
+
 }
 
 int main(void) {
@@ -214,11 +261,14 @@ int main(void) {
   pthread_t *thread = NULL;
   game_info_t gi = {0};
   gi.high_score = get_high_score();
-  gi.delay = 1000000;
+  gi.delay = 10000;
   gi.level = 1;
 
-  while (1) {
+  int running = 1;
+
+  while (running) {
     spawn_figure(&gi, &thread);
+    running = !game_over(&gi);
     render(&gi);
     gi.state = get_current_state();
     take_pause(&gi);
@@ -232,7 +282,12 @@ int main(void) {
     gain_score(&gi);
     erase(); // очистить экран
   }
-  endwin();
+
+  erase();
+
+  terminate_game(&gi);
+  recall(&gi, thread);
+
   return 0;
 }
 
@@ -268,25 +323,28 @@ void render(game_info_t *gi) {
   for (int i = 0; i < HEIGHT; i++) {
     for (int j = 0; j < WIDTH; j++) {
       attron(COLOR_PAIR(temp_field[i][j].color_pair));
-      if (temp_field[i][j].value) {
-        printw("%3c", ' '); // рисовать фигуру
-      } else {
-        printw("%3c", ' '); // пустое пространство
-      }
+      printw("%3c", ' ');
       attroff(COLOR_PAIR(temp_field[i][j].color_pair));
     }
     printw("\n");
   }
   for (int i = 0; i < gi->next_figure->height; i++) {
     for (int j = 0; j < gi->next_figure->width; j++) {
-      mvaddch(i + 10, j + 50, gi->next_figure->matrix[i][j] ? '#' : ' ');
+      if (gi->next_figure->matrix[i][j]) {
+        attron(COLOR_PAIR(gi->next_figure->color_pair));
+        mvprintw(5 + i, 35 + j, "%2s", " ");
+        attroff(COLOR_PAIR(gi->next_figure->color_pair));
+      }
     }
   }
-  curs_set(120);
-  printw("\tscore: %d", gi->score);
-  printw("\thigh score: %d", gi->high_score);
-  curs_set(0);
-  refresh();
+  mvprintw(1, 35, "SCORE: %d", gi->score);
+  mvprintw(2, 35, "BEST SCORE: %d", gi->high_score);
+  mvprintw(3, 35, "LVL: %d", gi->level);
+  // if (gi->pause) {
+  //   attron(COLOR_PAIR(8));
+  //   mvprintw(8, 35, "PAUSED");
+  //   attron(COLOR_PAIR(8));
+  // }
 }
 
 void move_down(cell_t field[][WIDTH], int line) {
