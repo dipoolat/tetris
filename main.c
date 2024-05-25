@@ -247,11 +247,14 @@ int game_over(game_info_t* gi) {
 void recall(game_info_t* gi, pthread_t* thread) {
   endwin();
 
+  if (gi->current_figure)
   delete_figure(gi->current_figure);
+  if (gi->next_figure)
   delete_figure(gi->next_figure);
-  pthread_cancel(*thread);
+  if (thread) {
+pthread_cancel(*thread);
   free(thread);
-
+  }
 }
 
 int main(void) {
@@ -320,6 +323,8 @@ void render(game_info_t *gi) {
       }
     }
   }
+  erase();
+
   for (int i = 0; i < HEIGHT; i++) {
     for (int j = 0; j < WIDTH; j++) {
       attron(COLOR_PAIR(temp_field[i][j].color_pair));
@@ -327,6 +332,11 @@ void render(game_info_t *gi) {
       attroff(COLOR_PAIR(temp_field[i][j].color_pair));
     }
     printw("\n");
+  }
+  for (int i = 0; i < WIDTH; i++) {
+    attron(COLOR_PAIR(7));
+      printw("%3c", ' ');
+      attroff(COLOR_PAIR(7));
   }
   for (int i = 0; i < gi->next_figure->height; i++) {
     for (int j = 0; j < gi->next_figure->width; j++) {
@@ -340,11 +350,12 @@ void render(game_info_t *gi) {
   mvprintw(1, 35, "SCORE: %d", gi->score);
   mvprintw(2, 35, "BEST SCORE: %d", gi->high_score);
   mvprintw(3, 35, "LVL: %d", gi->level);
-  // if (gi->pause) {
-  //   attron(COLOR_PAIR(8));
-  //   mvprintw(8, 35, "PAUSED");
-  //   attron(COLOR_PAIR(8));
-  // }
+  if (gi->pause) {
+    attron(COLOR_PAIR(8));
+    mvprintw(8, 35, "PAUSED");
+    attron(COLOR_PAIR(8));
+  }
+  refresh();
 }
 
 void move_down(cell_t field[][WIDTH], int line) {
