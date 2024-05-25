@@ -12,6 +12,7 @@ typedef struct {
   int **matrix;
   int height;
   int width;
+  int color_pair;
 } figure_t;
 
 void create_figure_matrix(figure_t *f);

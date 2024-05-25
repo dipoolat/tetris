@@ -37,6 +37,7 @@ void create_figure_matrix(figure_t *f) {
   int matrix_type = (float)((float)rand() / RAND_MAX) * 7;
   switch (matrix_type) {
   case 0:
+    f->color_pair = 1;
     f->width = 2;
     f->height = 2;
     f->matrix = calloc(2, sizeof(int *));
@@ -48,6 +49,7 @@ void create_figure_matrix(figure_t *f) {
     }
     break;
   case 1:
+    f->color_pair = 2;
     f->width = 3;
     f->height = 2;
     f->matrix = calloc(2, sizeof(int *));
@@ -59,6 +61,7 @@ void create_figure_matrix(figure_t *f) {
     }
     break;
   case 2:
+    f->color_pair = 3;
     f->width = 3;
     f->height = 2;
     f->matrix = calloc(2, sizeof(int *));
@@ -70,6 +73,7 @@ void create_figure_matrix(figure_t *f) {
     }
     break;
   case 3:
+    f->color_pair = 4;
     f->width = 3;
     f->height = 2;
     f->matrix = calloc(2, sizeof(int *));
@@ -81,15 +85,17 @@ void create_figure_matrix(figure_t *f) {
     }
     break;
   case 4:
-    f->width = 5;
+    f->color_pair = 5;
+    f->width = 4;
     f->height = 1;
     f->matrix = calloc(1, sizeof(int *));
     f->matrix[0] = calloc(5, sizeof(int));
-    for (int j = 0; j < 5; j++) {
+    for (int j = 0; j < 4; j++) {
       f->matrix[0][j] = 1;
     }
     break;
   case 5:
+    f->color_pair = 6;
     f->width = 3;
     f->height = 2;
     f->matrix = calloc(2, sizeof(int *));
@@ -101,6 +107,7 @@ void create_figure_matrix(figure_t *f) {
     }
     break;
   case 6:
+    f->color_pair = 7;
     f->width = 3;
     f->height = 2;
     f->matrix = calloc(2, sizeof(int *));
