@@ -10,6 +10,6 @@ void render(game_info_t *gi) {
   render_border();
   render_side_panel(gi);
   render_next_figure(gi);
-  
+
   refresh();
 }
