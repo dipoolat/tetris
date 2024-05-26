@@ -1,7 +1,9 @@
 all: build run
 
+
 create_obj_dir:
 	@mkdir obj -p
+
 
 compile: create_obj_dir
 	@gcc -g -Wall -Wextra -Werror -c brick_game/tetris/functions/calc_score.c -lncurses -o obj/calc_score.o
@@ -38,11 +40,35 @@ compile: create_obj_dir
 	@gcc -g -Wall -Wextra -Werror -c gui/cli/render.c -lncurses -o obj/render.o
 	@gcc -g -Wall -Wextra -Werror -c gui/cli/sum_array.c -lncurses -o obj/sum_array.o
 
+	@ar rcs tetris_core.a obj/*
+	@ranlib tetris_core.a
+
+
+
 build: compile
-	@gcc -g -Wall -Wextra -Werror brick_game/tetris/main.c obj/* -lncurses -o tetris
+	@gcc -g -Wall -Wextra -Werror brick_game/tetris/main.c tetris_core.a -lncurses -o tetris
+
 
 run: build
 	@./tetris
 
+
+clean:
+	@rm -rf obj tetris high_score report.out *.dSYM *.a *.out *.gcov *.info *.gcda *.gcno *.o out report 
+
+
 style:
 	@clang-format -i *.c *.h
+
+
+test: compile
+	@gcc -Wall -Wextra -Werror test/tetris_test.c tetris_core.a -o test.out -lcheck -lm -lpthread -lrt -lsubunit -lncurses
+	@./test.out
+
+
+gcov_report: compile
+	-@ gcc -Wall -Wextra -Werror obj/*.o -lcheck -lsubunit -lm --coverage -o test
+	-@ ./test
+	-@ lcov --capture --directory . --output-file coverage.info
+	-@ genhtml coverage.info --output-directory out
+
