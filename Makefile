@@ -1,4 +1,4 @@
-all: build run
+all: all install uninstall clean dvi dist test gcov_report
 
 
 create_obj_dir:
@@ -80,16 +80,16 @@ compile_gcov: clean create_obj_dir
 
 
 
-build: compile
-	@gcc -Wall -Wextra -Werror brick_game/tetris/main.c tetris_core.a -lncurses -o tetris
+install: compile
+	@mkdir  ~/tetris/ -p
+	@gcc -Wall -Wextra -Werror brick_game/tetris/main.c tetris_core.a -lncurses -o ~/tetris/tetris
 
 
-run: build
-	@./tetris
-
+uninstall:
+	@rm -rf ~/tetris/
 
 clean:
-	@rm -rf docs obj tetris high_score report.out *.dSYM *.a *.out *.gcov *.info *.gcda *.gcno *.o out report test.out
+	@rm -rf dist docs obj tetris high_score report.out *.dSYM *.a *.out *.gcov *.info *.gcda *.gcno *.o out report test.out
 
 
 style:
@@ -109,5 +109,10 @@ gcov_report: compile_gcov
 	@genhtml coverage.info --output-directory out
 
 
-dvi:
+dvi: 
 	@doxygen
+
+
+dist: dvi compile
+	@mkdir -p dist
+	@tar cf dist/tetris-1.0.tar ./ docs
