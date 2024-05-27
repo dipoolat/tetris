@@ -1,9 +1,10 @@
 #include "../tetris.h"
 //Создает новую фигуру и запускает ее падение в отдельном потоке.
 //Если `gi->next_figure` равно NULL, создается новая фигура (`gi->next_figure`).
-//Текущая фигура (`gi->current_figure`) становится равной следующей фигуре (`gi->next_figure`). 
-//Создается новая фигура для `gi->next_figure`.
-//Создается новый поток с помощью `pthread_create`, в котором запускается функция `fall_figure`.
+//Текущая фигура (`gi->current_figure`) становится равной следующей фигуре
+//(`gi->next_figure`). Создается новая фигура для `gi->next_figure`. Создается
+//новый поток с помощью `pthread_create`, в котором запускается функция
+//`fall_figure`.
 void spawn_figure(game_info_t *gi, pthread_t **thread) {
   if (gi->current_figure != NULL)
     return;

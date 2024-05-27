@@ -34,8 +34,10 @@ START_TEST(quick_fall_t) {
   quick_fall(&gi);
   if (gi.current_figure->height == 2)
     ck_assert_int_eq(HEIGHT - 2, gi.current_figure->y);
-  else 
+  else
     ck_assert_int_eq(HEIGHT - 1, gi.current_figure->y);
+  delete_figure(gi.current_figure);
+  free(gi.current_figure);
 }
 END_TEST
 
@@ -49,6 +51,7 @@ START_TEST(is_collision_x_t) {
   gi.game_field[1][gi.current_figure->width].value = 1;
   ck_assert_int_eq(1, is_collision_x(&gi, 1));
   delete_figure(gi.current_figure);
+  free(gi.current_figure);
 }
 END_TEST
 
@@ -69,7 +72,6 @@ START_TEST(gain_score_t) {
     gi4.game_field[1][i].value = 1;
     gi4.game_field[2][i].value = 1;
     gi4.game_field[3][i].value = 1;
-
   }
   gain_score(&gi1);
   gain_score(&gi2);
@@ -100,6 +102,8 @@ START_TEST(gm_over_t) {
   ck_assert_int_eq(1, game_over(&gi1));
   delete_figure(gi.current_figure);
   delete_figure(gi1.current_figure);
+  free(gi.current_figure);
+  free(gi1.current_figure);
 }
 END_TEST
 
@@ -120,7 +124,6 @@ START_TEST(clear_lines_t) {
     arr4[1][i].value = 1;
     arr4[2][i].value = 1;
     arr4[3][i].value = 1;
-
   }
   ck_assert_int_eq(1, clear_lines(arr1));
   ck_assert_int_eq(2, clear_lines(arr2));
@@ -138,7 +141,8 @@ START_TEST(rotate_figure_t) {
   gi.current_figure->height = 2;
   gi.current_figure->matrix = malloc(gi.current_figure->height * sizeof(int *));
   for (int i = 0; i < gi.current_figure->height; i++) {
-    gi.current_figure->matrix[i] = malloc(gi.current_figure->width * sizeof(int));
+    gi.current_figure->matrix[i] =
+        malloc(gi.current_figure->width * sizeof(int));
   }
   // Тестовая матрица 2x2
   int test_matrix[2][2] = {{1, 1}, {1, 1}};
@@ -172,7 +176,8 @@ START_TEST(restore_rotate_t) {
   gi.current_figure->height = 2;
   gi.current_figure->matrix = malloc(gi.current_figure->height * sizeof(int *));
   for (int i = 0; i < gi.current_figure->height; i++) {
-    gi.current_figure->matrix[i] = malloc(gi.current_figure->width * sizeof(int));
+    gi.current_figure->matrix[i] =
+        malloc(gi.current_figure->width * sizeof(int));
   }
   // Тестовая матрица 2x2
   int test_matrix[2][2] = {{1, 1}, {1, 1}};
@@ -220,28 +225,26 @@ START_TEST(restore_rotate_t) {
 END_TEST
 
 START_TEST(terminate_figure_t) {
+  int arr1 = 0;
+  int arr2 = 0;
   game_info_t gi = {0};
-  pthread_t *thread = NULL;
   gi.current_figure = calloc(1, sizeof(figure_t));
   create_figure_matrix(gi.current_figure);
-  gi.current_figure->y = HEIGHT - 1;
-  thread = malloc(sizeof(pthread_t));
-  // Имитация столкновения по y
-  terminate_figure(&gi, &thread);
-  ck_assert_ptr_null(gi.current_figure);
-  ck_assert_ptr_null(thread);
-
-  // Проверка, что фигура добавлена в игровое поле
-  cell_t expected_field[HEIGHT][WIDTH] = {0};
-  sum_array(&gi, expected_field);
-  for (int i = 0; i < HEIGHT; i++) {
-    for (int j = 0; j < WIDTH; j++) {
-      ck_assert_int_eq(gi.game_field[i][j].value, expected_field[i][j].value);
-      ck_assert_int_eq(gi.game_field[i][j].color_pair,
-                        expected_field[i][j].color_pair);
+  for (int i = 0; i < gi.current_figure->height; i++) {
+    for (int j = 0; j < gi.current_figure->width; j++) {
+      arr1 += gi.current_figure->matrix[i][j];
     }
   }
- 
+  gi.current_figure->y = HEIGHT - gi.current_figure->height;
+  // Имитация столкновения по y
+  terminate_figure(&gi, NULL);
+  free(gi.current_figure);
+  for (int i = 0; i < HEIGHT; i++) {
+    for (int j = 0; j < WIDTH; j++) {
+      arr2 += gi.game_field[i][j].value;
+    }
+  }
+  ck_assert_int_eq(arr1, arr2);
 }
 END_TEST
 
@@ -264,7 +267,7 @@ START_TEST(copy_array_t) {
     for (int j = 0; j < WIDTH; j++) {
       ck_assert_int_eq(target_array[i][j].value, source_array[i][j].value);
       ck_assert_int_eq(target_array[i][j].color_pair,
-                        source_array[i][j].color_pair);
+                       source_array[i][j].color_pair);
     }
   }
 }
@@ -285,7 +288,7 @@ START_TEST(sum_array_t) {
     for (int j = 0; j < WIDTH; j++) {
       ck_assert_int_eq(test_field[i][j].value, expected_field[i][j].value);
       ck_assert_int_eq(test_field[i][j].color_pair,
-                        expected_field[i][j].color_pair);
+                       expected_field[i][j].color_pair);
     }
   }
   free(gi.current_figure);

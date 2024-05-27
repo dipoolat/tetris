@@ -71,9 +71,9 @@ compile_gcov: clean create_obj_dir
 	@gcc -g -Wall -Wextra -Werror -c gui/cli/components/next_figure.c -lncurses -o obj/next_figure.o
 	@gcc -g -Wall -Wextra -Werror -c gui/cli/components/side_panel.c -lncurses -o obj/side_panel.o
 
-	@gcc -g -Wall -Wextra -Werror -c gui/cli/copy_array.c -lncurses -o obj/copy_array.o
+	@gcc --coverage -g -Wall -Wextra -Werror -c gui/cli/copy_array.c -lncurses -o obj/copy_array.o
 	@gcc -g -Wall -Wextra -Werror -c gui/cli/render.c -lncurses -o obj/render.o
-	@gcc -g -Wall -Wextra -Werror -c gui/cli/sum_array.c -lncurses -o obj/sum_array.o
+	@gcc --coverage -g -Wall -Wextra -Werror -c gui/cli/sum_array.c -lncurses -o obj/sum_array.o
 
 	@ar rcs tetris_core.a obj/*
 	@ranlib tetris_core.a
