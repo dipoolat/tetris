@@ -89,7 +89,7 @@ run: build
 
 
 clean:
-	@rm -rf obj tetris high_score report.out *.dSYM *.a *.out *.gcov *.info *.gcda *.gcno *.o out report test.out
+	@rm -rf docs obj tetris high_score report.out *.dSYM *.a *.out *.gcov *.info *.gcda *.gcno *.o out report test.out
 
 
 style:
@@ -108,3 +108,6 @@ gcov_report: compile_gcov
 	@lcov --capture --directory . --output-file coverage.info
 	@genhtml coverage.info --output-directory out
 
+
+dvi:
+	@doxygen

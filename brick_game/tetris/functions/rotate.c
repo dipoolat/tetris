@@ -1,7 +1,5 @@
 #include "../tetris.h"
-//Вращает текущую фигуру против часовой стрелки.
-//Если `gi->state` не равно ROTATE, функция ничего не делает
-//Высота и ширина фигуры меняются местами
+
 void rotate_figure(game_info_t *gi) {
 
   if (gi->state != ROTATE)

@@ -1,8 +1,5 @@
 #include "../tetris.h"
-//Перемещает текущую фигуру влево или вправо.
-// gi->state`: Текущее состояние игры (LEFT - влево, RIGHT - вправо)
-//Если текущее состояние не является LEFT или RIGHT
-//или игра находится на паузе, функция ничего не делает.
+
 void move_figure(game_info_t *gi) {
   if ((gi->state != LEFT && gi->state != RIGHT) || gi->pause)
     return;

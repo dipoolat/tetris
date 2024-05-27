@@ -1,5 +1,5 @@
 #include "../../../brick_game/tetris/tetris.h"
-//Отображает сообщение о завершении игры на экране.
+
 void terminate_game(game_info_t *gi) {
   int y, x;
   getmaxyx(stdscr, y, x);
