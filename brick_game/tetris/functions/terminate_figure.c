@@ -1,6 +1,6 @@
 #include "../tetris.h"
 
-void terminate_figure(game_info_t *gi, pthread_t **thread) {
+void terminate_figure(GameInfo_t *gi, pthread_t **thread) {
   if (is_collision_y(gi)) {
     if (thread != NULL)
       pthread_cancel(**thread);

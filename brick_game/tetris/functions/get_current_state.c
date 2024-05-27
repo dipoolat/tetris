@@ -1,7 +1,7 @@
 #include "../tetris.h"
 
-game_state_t get_current_state() {
-  game_state_t action = DOWN;
+UserAction_t get_current_state() {
+  UserAction_t action = DOWN;
   switch (getch()) {
   case KEY_UP:
   case 'r':

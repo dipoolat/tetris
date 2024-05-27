@@ -1,6 +1,6 @@
 #include "../../brick_game/tetris/tetris.h"
 
-void render(game_info_t *gi) {
+void render(GameInfo_t *gi) {
   cell_t temp_field[HEIGHT][WIDTH] = {0};
   copy_array(gi->game_field, temp_field);
   sum_array(gi, temp_field);

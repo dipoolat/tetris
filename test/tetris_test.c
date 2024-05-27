@@ -12,7 +12,7 @@ START_TEST(calc_score_t) {
 END_TEST
 
 START_TEST(take_pause_t) {
-  game_info_t gi = {0};
+  GameInfo_t gi = {0};
   gi.state = PAUSE;
   take_pause(&gi);
   ck_assert_int_eq(1, gi.pause);
@@ -25,7 +25,7 @@ START_TEST(take_pause_t) {
 END_TEST
 
 START_TEST(quick_fall_t) {
-  game_info_t gi = {0};
+  GameInfo_t gi = {0};
   gi.state = FAST_DOWN;
   gi.current_figure = calloc(1, sizeof(figure_t));
   create_figure_matrix(gi.current_figure);
@@ -42,7 +42,7 @@ START_TEST(quick_fall_t) {
 END_TEST
 
 START_TEST(is_collision_x_t) {
-  game_info_t gi = {0};
+  GameInfo_t gi = {0};
   gi.current_figure = calloc(1, sizeof(figure_t));
   create_figure_matrix(gi.current_figure);
   ck_assert_int_eq(0, is_collision_x(&gi, -1));
@@ -56,11 +56,11 @@ START_TEST(is_collision_x_t) {
 END_TEST
 
 START_TEST(gain_score_t) {
-  game_info_t gi1 = {0};
-  game_info_t gi2 = {0};
-  game_info_t gi3 = {0};
-  game_info_t gi4 = {0};
-  game_info_t gi5 = {0};
+  GameInfo_t gi1 = {0};
+  GameInfo_t gi2 = {0};
+  GameInfo_t gi3 = {0};
+  GameInfo_t gi4 = {0};
+  GameInfo_t gi5 = {0};
   for (int i = 0; i < WIDTH; i++) {
     gi1.game_field[0][i].value = 1;
     gi2.game_field[0][i].value = 1;
@@ -87,8 +87,8 @@ START_TEST(gain_score_t) {
 END_TEST
 
 START_TEST(gm_over_t) {
-  game_info_t gi = {0};
-  game_info_t gi1 = {0};
+  GameInfo_t gi = {0};
+  GameInfo_t gi1 = {0};
   for (int i = 0; i < HEIGHT; i++) {
     for (int j = 0; j < WIDTH; j++) {
       gi1.game_field[i][j].value = 1;
@@ -134,7 +134,7 @@ START_TEST(clear_lines_t) {
 END_TEST
 
 START_TEST(rotate_figure_t) {
-  game_info_t gi = {0};
+  GameInfo_t gi = {0};
   gi.state = ROTATE;
   gi.current_figure = calloc(1, sizeof(figure_t));
   gi.current_figure->width = 2;
@@ -169,7 +169,7 @@ START_TEST(rotate_figure_t) {
 END_TEST
 
 START_TEST(restore_rotate_t) {
-  game_info_t gi = {0};
+  GameInfo_t gi = {0};
   gi.state = ROTATE;
   gi.current_figure = calloc(1, sizeof(figure_t));
   gi.current_figure->width = 2;
@@ -227,7 +227,7 @@ END_TEST
 START_TEST(terminate_figure_t) {
   int arr1 = 0;
   int arr2 = 0;
-  game_info_t gi = {0};
+  GameInfo_t gi = {0};
   gi.current_figure = calloc(1, sizeof(figure_t));
   create_figure_matrix(gi.current_figure);
   for (int i = 0; i < gi.current_figure->height; i++) {
@@ -274,7 +274,7 @@ START_TEST(copy_array_t) {
 END_TEST
 
 START_TEST(sum_array_t) {
-  game_info_t gi = {0};
+  GameInfo_t gi = {0};
   gi.current_figure = calloc(1, sizeof(figure_t));
   create_figure_matrix(gi.current_figure);
   gi.current_figure->y = 1;

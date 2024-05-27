@@ -1,6 +1,6 @@
 #include "../tetris.h"
 
-void move_figure(game_info_t *gi) {
+void move_figure(GameInfo_t *gi) {
   if ((gi->state != LEFT && gi->state != RIGHT) || gi->pause)
     return;
   int direction = gi->state == LEFT ? -1 : 1;

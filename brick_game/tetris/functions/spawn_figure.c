@@ -1,6 +1,6 @@
 #include "../tetris.h"
 
-void spawn_figure(game_info_t *gi, pthread_t **thread) {
+void spawn_figure(GameInfo_t *gi, pthread_t **thread) {
   if (gi->current_figure != NULL)
     return;
   if (gi->next_figure == NULL) {

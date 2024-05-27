@@ -9,7 +9,8 @@ typedef enum {
   DOWN,
   FAST_DOWN,
   TERMINMATE,
-  ROTATE
-} game_state_t;
+  ROTATE,
+  ACTION
+} UserAction_t;
 
 #endif //_STATES_H

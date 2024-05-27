@@ -1,6 +1,6 @@
 #include "../tetris.h"
 
-void gain_score(game_info_t *gi) {
+void gain_score(GameInfo_t *gi) {
   gi->score += calculate_score(clear_lines(gi->game_field));
   if (gi->score > gi->high_score)
     set_high_score(gi->score);

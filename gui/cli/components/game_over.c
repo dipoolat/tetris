@@ -1,6 +1,6 @@
 #include "../../../brick_game/tetris/tetris.h"
 
-void terminate_game(game_info_t *gi) {
+void terminate_game(GameInfo_t *gi) {
   int y, x;
   getmaxyx(stdscr, y, x);
   mvprintw(y / 2, x / 2 - strlen("Game Over") / 2, "Game Over");

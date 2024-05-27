@@ -1,6 +1,6 @@
 #include "../../../brick_game/tetris/tetris.h"
 
-void render_next_figure(game_info_t *gi) {
+void render_next_figure(GameInfo_t *gi) {
   for (int i = 0; i < gi->next_figure->height; i++) {
     for (int j = 0; j < gi->next_figure->width; j++) {
       if (gi->next_figure->matrix[i][j]) {

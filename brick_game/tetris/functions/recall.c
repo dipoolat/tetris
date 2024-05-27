@@ -1,6 +1,6 @@
 #include "../tetris.h"
 
-void recall(game_info_t *gi, pthread_t *thread) {
+void recall(GameInfo_t *gi, pthread_t *thread) {
   endwin();
 
   if (gi->current_figure)

@@ -1,6 +1,6 @@
 #include "../tetris.h"
 
-void rotate_figure(game_info_t *gi) {
+void rotate_figure(GameInfo_t *gi) {
 
   if (gi->state != ROTATE)
     return;
