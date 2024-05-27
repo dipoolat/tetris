@@ -31,7 +31,9 @@ const int matrix_7[][3] = {
     {1, 1, 0},
     {0, 1, 1},
 };
-
+//эта функция генерирует случайную матрицу для фигуры (`figure_t`)
+//Генерируется случайное число от 0 до 6, используя `rand()` и деление на `RAND_MAX`, которое представляет
+// собой максимальное значение, которое может быть сгенерировано функцией
 void create_figure_matrix(figure_t *f) {
   srand(time(NULL));
   int matrix_type = (float)((float)rand() / RAND_MAX) * 7;
@@ -120,7 +122,7 @@ void create_figure_matrix(figure_t *f) {
     break;
   }
 }
-
+//Освобождает память, выделенную для матрицы фигуры
 void delete_figure(figure_t *f) {
   for (int i = 0; i < f->height; i++) {
     free(f->matrix[i]);

@@ -1,5 +1,5 @@
 #include "../../../brick_game/tetris/tetris.h"
-
+//Отображает следующую фигуру на боковой панели.
 void render_next_figure(game_info_t *gi) {
   for (int i = 0; i < gi->next_figure->height; i++) {
     for (int j = 0; j < gi->next_figure->width; j++) {

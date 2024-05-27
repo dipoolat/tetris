@@ -1,5 +1,5 @@
 #include "headers/file_reader.h"
-
+//Загружает максимальный счет игры из файла `FILE_PATH`
 int get_high_score() {
   int a;
   FILE *score = fopen(FILE_PATH, "r+");
@@ -9,7 +9,7 @@ int get_high_score() {
   fclose(score);
   return a;
 }
-
+//Сохраняет максимальный счет игры в файл `FILE_PATH`
 void set_high_score(int score) {
   FILE *score_file = fopen(FILE_PATH, "w+");
   fprintf(score_file, "%d", score);

@@ -1,5 +1,6 @@
 #include "../tetris.h"
-
+//Проверяет, происходит ли столкновение текущей фигуры с 
+//дном игрового поля или с другими фигурами при движении вниз.
 int is_collision_y(game_info_t *gi) {
   for (int i = 0; i < gi->current_figure->height; i++) {
     for (int j = 0; j < gi->current_figure->width; j++) {

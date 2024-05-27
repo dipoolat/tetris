@@ -1,5 +1,5 @@
 #include "../../../brick_game/tetris/tetris.h"
-
+//Отрисовывает игровое поле на экране.
 void render_game(cell_t t[HEIGHT][WIDTH]) {
   for (int i = 0; i < HEIGHT; i++) {
     for (int j = 0; j < WIDTH; j++) {

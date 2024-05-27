@@ -1,5 +1,5 @@
 #include "../../../brick_game/tetris/tetris.h"
-
+//Отображает боковую панель с информацией о игре.
 void render_side_panel(game_info_t *gi) {
   mvprintw(1, 35, "SCORE: %d", gi->score);
   mvprintw(2, 35, "BEST SCORE: %d", gi->high_score);

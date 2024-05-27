@@ -1,5 +1,5 @@
 #include "tetris.h"
-
+//точка входа
 int main(void) {
 
   init_ncurses();

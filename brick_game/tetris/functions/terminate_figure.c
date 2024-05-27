@@ -1,5 +1,7 @@
 #include "../tetris.h"
-
+//Завершает падение текущей фигуры, если она столкнулась с дном или другой фигурой
+//Если происходит столкновение (`is_collision_y(gi)`), поток, отвечающий за 
+//падение фигуры, завершается с помощью `pthread_cancel(**thread)
 void terminate_figure(game_info_t *gi, pthread_t **thread) {
   if (is_collision_y(gi)) {
     pthread_cancel(**thread);

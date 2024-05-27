@@ -1,5 +1,6 @@
 #include "../tetris.h"
-
+// в функцию на вход подается количество очищенных линий, 
+//в зависимости от этого начисляются очки
 int calculate_score(int lines_cleared) {
   switch (lines_cleared) {
   case 1:
