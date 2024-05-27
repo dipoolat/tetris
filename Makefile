@@ -36,6 +36,7 @@ compile: create_obj_dir
 	@gcc -g -Wall -Wextra -Werror -c gui/cli/components/game.c -lncurses -o obj/game.o
 	@gcc -g -Wall -Wextra -Werror -c gui/cli/components/next_figure.c -lncurses -o obj/next_figure.o
 	@gcc -g -Wall -Wextra -Werror -c gui/cli/components/side_panel.c -lncurses -o obj/side_panel.o
+	@gcc -g -Wall -Wextra -Werror -c gui/cli/components/hello.c -lncurses -o obj/hello.o
 
 	@gcc -g -Wall -Wextra -Werror -c gui/cli/copy_array.c -lncurses -o obj/copy_array.o
 	@gcc -g -Wall -Wextra -Werror -c gui/cli/render.c -lncurses -o obj/render.o
@@ -73,6 +74,7 @@ compile_gcov: clean create_obj_dir
 	@gcc -g -Wall -Wextra -Werror -c gui/cli/components/game.c -lncurses -o obj/game.o
 	@gcc -g -Wall -Wextra -Werror -c gui/cli/components/next_figure.c -lncurses -o obj/next_figure.o
 	@gcc -g -Wall -Wextra -Werror -c gui/cli/components/side_panel.c -lncurses -o obj/side_panel.o
+	@gcc -g -Wall -Wextra -Werror -c gui/cli/components/hello.c -lncurses -o obj/hello.o
 
 	@gcc --coverage -g -Wall -Wextra -Werror -c gui/cli/copy_array.c -lncurses -o obj/copy_array.o
 	@gcc -g -Wall -Wextra -Werror -c gui/cli/render.c -lncurses -o obj/render.o
@@ -96,7 +98,7 @@ clean:
 
 
 style:
-	@clang-format -i *.c *.h */*.c */*.h */*/*.c */*/*.h */*/*/*.c */*/*/*.h
+	@ find . -name "*.m" -o -name "*.h" | sed 's| |\\ |g' | xargs clang-format -i
 
 
 test: compile
