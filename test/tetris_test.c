@@ -130,6 +130,167 @@ START_TEST(clear_lines_t) {
 }
 END_TEST
 
+START_TEST(rotate_figure_t) {
+  game_info_t gi = {0};
+  gi.state = ROTATE;
+  gi.current_figure = calloc(1, sizeof(figure_t));
+  gi.current_figure->width = 2;
+  gi.current_figure->height = 2;
+  gi.current_figure->matrix = malloc(gi.current_figure->height * sizeof(int *));
+  for (int i = 0; i < gi.current_figure->height; i++) {
+    gi.current_figure->matrix[i] = malloc(gi.current_figure->width * sizeof(int));
+  }
+  // Тестовая матрица 2x2
+  int test_matrix[2][2] = {{1, 1}, {1, 1}};
+  for (int i = 0; i < gi.current_figure->height; i++) {
+    for (int j = 0; j < gi.current_figure->width; j++) {
+      gi.current_figure->matrix[i][j] = test_matrix[i][j];
+    }
+  }
+  rotate_figure(&gi);
+  ck_assert_int_eq(2, gi.current_figure->width);
+  ck_assert_int_eq(2, gi.current_figure->height);
+  // Проверка, что матрица не изменилась после вращения
+  for (int i = 0; i < gi.current_figure->height; i++) {
+    for (int j = 0; j < gi.current_figure->width; j++) {
+      ck_assert_int_eq(test_matrix[i][j], gi.current_figure->matrix[i][j]);
+    }
+  }
+  for (int i = 0; i < gi.current_figure->height; i++) {
+    free(gi.current_figure->matrix[i]);
+  }
+  free(gi.current_figure->matrix);
+  free(gi.current_figure);
+}
+END_TEST
+
+START_TEST(restore_rotate_t) {
+  game_info_t gi = {0};
+  gi.state = ROTATE;
+  gi.current_figure = calloc(1, sizeof(figure_t));
+  gi.current_figure->width = 2;
+  gi.current_figure->height = 2;
+  gi.current_figure->matrix = malloc(gi.current_figure->height * sizeof(int *));
+  for (int i = 0; i < gi.current_figure->height; i++) {
+    gi.current_figure->matrix[i] = malloc(gi.current_figure->width * sizeof(int));
+  }
+  // Тестовая матрица 2x2
+  int test_matrix[2][2] = {{1, 1}, {1, 1}};
+  for (int i = 0; i < gi.current_figure->height; i++) {
+    for (int j = 0; j < gi.current_figure->width; j++) {
+      gi.current_figure->matrix[i][j] = test_matrix[i][j];
+    }
+  }
+
+  // Тест 1: Столкновение по y
+  gi.current_figure->y = HEIGHT - 1;
+  restore_rotate(&gi);
+  for (int i = 0; i < gi.current_figure->height; i++) {
+    for (int j = 0; j < gi.current_figure->width; j++) {
+      ck_assert_int_eq(test_matrix[i][j], gi.current_figure->matrix[i][j]);
+    }
+  }
+
+  // Тест 2: Столкновение по x
+  gi.current_figure->y = 0;
+  gi.current_figure->x = WIDTH - 2;
+  restore_rotate(&gi);
+  for (int i = 0; i < gi.current_figure->height; i++) {
+    for (int j = 0; j < gi.current_figure->width; j++) {
+      ck_assert_int_eq(test_matrix[i][j], gi.current_figure->matrix[i][j]);
+    }
+  }
+
+  // Тест 3:  Нет столкновений
+  gi.current_figure->y = 0;
+  gi.current_figure->x = 0;
+  restore_rotate(&gi);
+  for (int i = 0; i < gi.current_figure->height; i++) {
+    for (int j = 0; j < gi.current_figure->width; j++) {
+      ck_assert_int_eq(test_matrix[i][j], gi.current_figure->matrix[i][j]);
+    }
+  }
+
+  for (int i = 0; i < gi.current_figure->height; i++) {
+    free(gi.current_figure->matrix[i]);
+  }
+  free(gi.current_figure->matrix);
+  free(gi.current_figure);
+}
+END_TEST
+
+START_TEST(terminate_figure_t) {
+  game_info_t gi = {0};
+  pthread_t *thread = NULL;
+  gi.current_figure = calloc(1, sizeof(figure_t));
+  create_figure_matrix(gi.current_figure);
+  gi.current_figure->y = HEIGHT - 1;
+  thread = malloc(sizeof(pthread_t));
+  // Имитация столкновения по y
+  terminate_figure(&gi, &thread);
+  ck_assert_ptr_null(gi.current_figure);
+  ck_assert_ptr_null(thread);
+
+  // Проверка, что фигура добавлена в игровое поле
+  cell_t expected_field[HEIGHT][WIDTH] = {0};
+  sum_array(&gi, expected_field);
+  for (int i = 0; i < HEIGHT; i++) {
+    for (int j = 0; j < WIDTH; j++) {
+      ck_assert_int_eq(gi.game_field[i][j].value, expected_field[i][j].value);
+      ck_assert_int_eq(gi.game_field[i][j].color_pair,
+                        expected_field[i][j].color_pair);
+    }
+  }
+ 
+}
+END_TEST
+
+START_TEST(copy_array_t) {
+  cell_t source_array[HEIGHT][WIDTH] = {0};
+  cell_t target_array[HEIGHT][WIDTH] = {0};
+
+  // Заполнение исходного массива тестовыми данными
+  for (int i = 0; i < HEIGHT; i++) {
+    for (int j = 0; j < WIDTH; j++) {
+      source_array[i][j].value = i + j;
+      source_array[i][j].color_pair = i * j;
+    }
+  }
+
+  copy_array(source_array, target_array);
+
+  // Проверка, что target_array содержит скопированные данные
+  for (int i = 0; i < HEIGHT; i++) {
+    for (int j = 0; j < WIDTH; j++) {
+      ck_assert_int_eq(target_array[i][j].value, source_array[i][j].value);
+      ck_assert_int_eq(target_array[i][j].color_pair,
+                        source_array[i][j].color_pair);
+    }
+  }
+}
+END_TEST
+
+START_TEST(sum_array_t) {
+  game_info_t gi = {0};
+  gi.current_figure = calloc(1, sizeof(figure_t));
+  create_figure_matrix(gi.current_figure);
+  gi.current_figure->y = 1;
+  gi.current_figure->x = 2;
+  cell_t expected_field[HEIGHT][WIDTH] = {0};
+  cell_t test_field[HEIGHT][WIDTH] = {0};
+
+  sum_array(&gi, test_field);
+  sum_array(&gi, expected_field);
+  for (int i = 0; i < HEIGHT; i++) {
+    for (int j = 0; j < WIDTH; j++) {
+      ck_assert_int_eq(test_field[i][j].value, expected_field[i][j].value);
+      ck_assert_int_eq(test_field[i][j].color_pair,
+                        expected_field[i][j].color_pair);
+    }
+  }
+  free(gi.current_figure);
+}
+END_TEST
 
 Suite *tetris_suite(void) {
   Suite *suite = suite_create("tetris");
@@ -142,6 +303,11 @@ Suite *tetris_suite(void) {
   tcase_add_test(tcase_core, is_collision_x_t);
   tcase_add_test(tcase_core, quick_fall_t);
   tcase_add_test(tcase_core, take_pause_t);
+  tcase_add_test(tcase_core, rotate_figure_t);
+  tcase_add_test(tcase_core, restore_rotate_t);
+  tcase_add_test(tcase_core, terminate_figure_t);
+  tcase_add_test(tcase_core, copy_array_t);
+  tcase_add_test(tcase_core, sum_array_t);
 
   suite_add_tcase(suite, tcase_core);
   return suite;
